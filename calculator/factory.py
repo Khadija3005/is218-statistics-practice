@@ -16,13 +16,26 @@ class CalculationFactory:
         "sum": Operations.sum,
         "mean": Operations.mean,
         "stddev": Operations.stddev,
-        # TODO: register the two new operation callables.
+        "adjust": Operations.adjust,
+        "span": Operations.span,
     }
-    operand_counts = {"add": 2, "subtract": 2, "multiply": 2, "divide": 2,
-                      "square": 1, "sqrt": 1, "power": 1}
-    # TODO: adjust is unary; span has variable arity (omit a fixed count).
-    allowed_options = {"power": {"exponent"}, "stddev": {"ddof"}}
-    # TODO: declare adjust's supported named settings; span accepts none.
+
+    operand_counts = {
+        "add": 2,
+        "subtract": 2,
+        "multiply": 2,
+        "divide": 2,
+        "square": 1,
+        "sqrt": 1,
+        "power": 1,
+        "adjust": 1,
+    }
+
+    allowed_options = {
+        "power": {"exponent"},
+        "stddev": {"ddof"},
+        "adjust": {"offset", "scale"},
+    }
 
     @staticmethod
     def create(name: str, *values, **options) -> Calculation:
@@ -42,4 +55,5 @@ class CalculationFactory:
         count = CalculationFactory.operand_counts.get(name)
         if count is not None and len(values) != count:
             raise ValueError(f"{name} requires exactly {count} value(s).")
+
         return Calculation(values, operation, **converted_options)

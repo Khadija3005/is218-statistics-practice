@@ -10,7 +10,11 @@ HELP = ("Commands: add/subtract/multiply/divide A B; square/sqrt VALUE; "
 def _format_entry(calculation, result) -> str:
     values = " ".join(str(value) for value in calculation.values)
     options = " ".join(f"{key}={value}" for key, value in calculation.options.items())
-    request = " ".join(part for part in (calculation.operation.__name__, values, options) if part)
+    request = " ".join(
+        part for part in
+        (calculation.operation.__name__, values, options)
+        if part
+    )
     return f"{request} = {result:.4f}"
 
 
@@ -35,8 +39,10 @@ class HistoryCommand(Command):
         self.session = session
 
     def execute(self) -> str:
-        lines = [_format_entry(calculation, result)
-                 for calculation, result in self.session.get_history()]
+        lines = [
+            _format_entry(calculation, result)
+            for calculation, result in self.session.get_history()
+        ]
         return "\n".join(lines) or "History is empty."
 
 
@@ -45,8 +51,13 @@ class LastCommand(Command):
         self.session = session
 
     def execute(self) -> str:
-        # TODO: read the latest saved entry; reuse formatting, never calculate again.
-        raise NotImplementedError("Implement last successful result")
+        history = self.session.get_history()
+
+        if not history:
+            return "History is empty."
+
+        calculation, result = history[-1]
+        return _format_entry(calculation, result)
 
 
 class ClearHistoryCommand(Command):
